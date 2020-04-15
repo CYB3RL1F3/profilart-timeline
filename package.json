@@ -28,6 +28,7 @@
     "compression": "^1.7.4",
     "dotenv": "^8.2.0",
     "mongoose": "^5.9.9",
+    "nest": "^0.1.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4"
