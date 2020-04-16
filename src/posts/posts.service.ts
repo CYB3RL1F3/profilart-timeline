@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Posts } from './posts.interface';
 import { CreatePostsDTO } from './posts.dto';
+
 
 @Injectable()
 export class PostsService {

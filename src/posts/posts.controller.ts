@@ -1,7 +1,8 @@
 // ./src/posts/posts.controller.ts
-import { Controller, Get, Res, HttpStatus, Post, Body, Put, Query, NotFoundException, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Res, HttpStatus, Post, Body, Put, NotFoundException, Delete, Param, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostsDTO } from './posts.dto';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -14,6 +15,7 @@ export class PostsController {
     }
     
     @Post()
+    @UseGuards(JwtAuthGuard)
     async addPosts(@Res() res, @Body() createPostsDTO: CreatePostsDTO) {
         const posts = await this.postsService.addPosts(createPostsDTO);
         return res.status(HttpStatus.OK).json({
@@ -39,6 +41,7 @@ export class PostsController {
 
     // Update a posts's details
     @Put('/:postId')
+    @UseGuards(JwtAuthGuard)
     async updatePosts(@Res() res, @Param('postId') postId, @Body() createPostsDTO: CreatePostsDTO) {
         const posts = await this.postsService.updatePosts(postId, createPostsDTO);
         if (!posts) throw new NotFoundException('Posts does not exist!');
@@ -50,6 +53,7 @@ export class PostsController {
 
     // Delete a posts
     @Delete('/:postId')
+    @UseGuards(JwtAuthGuard)
     async deletePosts(@Res() res, @Param('postId') postID) {
         const posts = await this.postsService.deletePosts(postID);
         if (!posts) throw new NotFoundException('Posts does not exist');
