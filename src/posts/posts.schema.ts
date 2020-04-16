@@ -1,12 +1,12 @@
 import * as mongoose from 'mongoose';
 
 export const PostsSchema = new mongoose.Schema({
-    author_id: String,
+    authorId: String,
     title: String,
     illustration: String,
     content: String,
     subtitle: String,
-    created_at: { 
+    createdAt: { 
       type: Date, 
       default: Date.now 
     }

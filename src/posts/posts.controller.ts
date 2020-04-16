@@ -1,7 +1,8 @@
 // ./src/posts/posts.controller.ts
-import { Controller, Get, Res, HttpStatus, Post, Body, Put, Query, NotFoundException, Delete, Param } from '@nestjs/common';
+import { Controller, Request, Get, Res, HttpStatus, Post, Body, Patch, NotFoundException, Delete, Param, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostsDTO } from './posts.dto';
+import { CreatePostsDTO, UpdatePostDTO } from './posts.dto';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -14,7 +15,10 @@ export class PostsController {
     }
     
     @Post()
-    async addPosts(@Res() res, @Body() createPostsDTO: CreatePostsDTO) {
+    @UseGuards(JwtAuthGuard)
+    async addPosts(@Request() req, @Res() res, @Body() createPostsDTO: CreatePostsDTO) {
+        if (!createPostsDTO.authorId) throw new UnauthorizedException("author_id must be precized");
+        if (req.user.uid !== createPostsDTO.authorId) throw new UnauthorizedException("You can't add posts for another user");
         const posts = await this.postsService.addPosts(createPostsDTO);
         return res.status(HttpStatus.OK).json({
             message: "Posts has been added successfully",
@@ -38,9 +42,13 @@ export class PostsController {
     }
 
     // Update a posts's details
-    @Put('/:postId')
-    async updatePosts(@Res() res, @Param('postId') postId, @Body() createPostsDTO: CreatePostsDTO) {
-        const posts = await this.postsService.updatePosts(postId, createPostsDTO);
+    @Patch('/:postId')
+    @UseGuards(JwtAuthGuard)
+    async updatePosts(@Request() req, @Res() res, @Param('postId') postId, @Body() updatePostDTO: UpdatePostDTO) {
+        const postToUpdate = await this.postsService.getPosts(postId);
+        if (!postToUpdate) throw new NotFoundException('Post does not exist');
+        if (postToUpdate.authorId !== req.user.uid) throw new UnauthorizedException('You are not allowed to update this post');
+        const posts = await this.postsService.updatePosts(postId, updatePostDTO);
         if (!posts) throw new NotFoundException('Posts does not exist!');
         return res.status(HttpStatus.OK).json({
             message: 'Posts has been successfully updated',
@@ -50,8 +58,13 @@ export class PostsController {
 
     // Delete a posts
     @Delete('/:postId')
-    async deletePosts(@Res() res, @Param('postId') postID) {
-        const posts = await this.postsService.deletePosts(postID);
+    @UseGuards(JwtAuthGuard)
+    async deletePosts(@Request() req, @Res() res, @Param('postId') postId) {
+        const postToDelete = await this.postsService.getPosts(postId);
+        if (!postToDelete) throw new NotFoundException('Post does not exist');
+        if (postToDelete.authorId !== req.user.uid) throw new UnauthorizedException('You are not allowed to delete this post');
+        
+        const posts = await this.postsService.deletePosts(postId);
         if (!posts) throw new NotFoundException('Posts does not exist');
         return res.status(HttpStatus.OK).json({
             message: 'Post has been deleted',
