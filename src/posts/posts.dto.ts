@@ -4,7 +4,7 @@ export class CreatePostsDTO {
     readonly illustration: string;
     readonly content: string;
     readonly substitle: string;
-    readonly created_at: Date;
+    readonly createdAt: Date;
 }
 export class UpdatePostDTO {
     readonly title?: string;
