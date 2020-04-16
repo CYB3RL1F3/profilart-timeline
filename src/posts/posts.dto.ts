@@ -1,5 +1,5 @@
 export class CreatePostsDTO {
-    readonly authorId: string;
+    authorId: string;
     readonly title: string;
     readonly illustration: string;
     readonly content: string;

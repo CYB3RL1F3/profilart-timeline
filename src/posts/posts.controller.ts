@@ -17,7 +17,7 @@ export class PostsController {
     @Post()
     @UseGuards(JwtAuthGuard)
     async addPosts(@Request() req, @Res() res, @Body() createPostsDTO: CreatePostsDTO) {
-        if (!createPostsDTO.authorId) throw new UnauthorizedException("author_id must be precized");
+        if (!createPostsDTO.authorId) createPostsDTO.authorId = req.user.uid;
         if (req.user.uid !== createPostsDTO.authorId) throw new UnauthorizedException("You can't add posts for another user");
         const posts = await this.postsService.addPosts(createPostsDTO);
         return res.status(HttpStatus.OK).json({
