@@ -7,4 +7,6 @@ export interface Posts extends Document {
     readonly content: string;
     readonly subtitle: string;
     readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly published: boolean;
 }

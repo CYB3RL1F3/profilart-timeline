@@ -6,7 +6,12 @@ export const PostsSchema = new mongoose.Schema({
     illustration: String,
     content: String,
     subtitle: String,
+    published: Boolean,
     createdAt: { 
+      type: Date, 
+      default: Date.now 
+    },
+    updatedAt: { 
       type: Date, 
       default: Date.now 
     }

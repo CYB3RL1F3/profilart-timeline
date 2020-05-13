@@ -48,7 +48,29 @@ export class PostsController {
         const postToUpdate = await this.postsService.getPosts(postId);
         if (!postToUpdate) throw new NotFoundException('Post does not exist');
         if (postToUpdate.authorId !== req.user.uid) throw new UnauthorizedException('You are not allowed to update this post');
-        const posts = await this.postsService.updatePosts(postId, updatePostDTO);
+        const posts = await this.postsService.updatePosts(postId, {
+            ...updatePostDTO,
+            updatedAt: new Date()
+        });
+        if (!posts) throw new NotFoundException('Posts does not exist!');
+        return res.status(HttpStatus.OK).json({
+            message: 'Posts has been successfully updated',
+            posts
+        });
+    }
+
+    // Update a posts's details
+    @Patch('/:postId/publish')
+    @UseGuards(JwtAuthGuard)
+    async publishPost(@Request() req, @Res() res, @Param('postId') postId) {
+        const postToUpdate = await this.postsService.getPosts(postId);
+        if (!postToUpdate) throw new NotFoundException('Post does not exist');
+        if (postToUpdate.authorId !== req.user.uid) throw new UnauthorizedException('You are not allowed to update this post');
+        const posts = await this.postsService.updatePosts(postId, {
+            ...postToUpdate,
+            published: true,
+            updatedAt: new Date()
+        });
         if (!posts) throw new NotFoundException('Posts does not exist!');
         return res.status(HttpStatus.OK).json({
             message: 'Posts has been successfully updated',
